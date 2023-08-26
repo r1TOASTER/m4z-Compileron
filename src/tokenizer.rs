@@ -5,6 +5,7 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
     let buffer_split : Vec<String> = buffer.split_whitespace().map(str::to_string).collect();
     // iterate over the splitted buffer (using whitespaces)
     for maybe_token in buffer_split {
+        println!("current token: {}", &maybe_token);
         if maybe_token.eq("dec") {
             tokens.push(Token { Type: TokenType::Dec, Data: None });
         }
@@ -37,6 +38,5 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
 
         }
     } 
-
     tokens
 }

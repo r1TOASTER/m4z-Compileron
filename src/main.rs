@@ -3,6 +3,8 @@ mod token;
 
 use std::{env, path::Path};
 
+use tokenizer::tokenize;
+
 fn main() {
     // Get args from command line
     let args: Vec<String> = env::args().collect();
@@ -27,5 +29,8 @@ fn main() {
         return;
     }
 
-    let input_file_buffer: String = input_file_path.to_str().expect("").to_owned();
+    let input_file_path: String = input_file_path.to_str().expect("").to_owned();
+    let mut input_file_buffer = std::fs::read_to_string(input_file_path).expect("Can't read the file");
+    let token_test = tokenize(&mut input_file_buffer);
+    dbg!(token_test);
 }

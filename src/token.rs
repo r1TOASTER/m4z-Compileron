@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+#[derive(Debug)]
 pub enum TokenType {
     IntLiteral,
     UIntLiteral,
@@ -38,6 +40,8 @@ pub enum TokenType {
     Colon
 }
 
+#[allow(non_snake_case)]
+#[derive(Debug)]
 pub struct Token {
     pub Type: TokenType,
     pub Data: Option<String>,

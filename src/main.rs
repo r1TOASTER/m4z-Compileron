@@ -1,3 +1,6 @@
+mod tokenizer;
+mod token;
+
 use std::{env, path::Path};
 
 fn main() {
@@ -24,6 +27,5 @@ fn main() {
         return;
     }
 
-    let input_file_buffer = input_file_path.to_str().expect("").to_owned();
-
+    let input_file_buffer: String = input_file_path.to_str().expect("").to_owned();
 }

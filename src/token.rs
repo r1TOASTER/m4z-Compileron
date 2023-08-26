@@ -7,6 +7,7 @@ pub enum TokenType {
     StrLiteral,
     DoubleLiteral,
     BooleanLiteral,
+    NameLiteral,
     IntKeyword,
     UIntKeyword,
     CharKeyword,

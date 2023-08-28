@@ -24,10 +24,8 @@ pub enum TokenType {
     ClosingCur,
     OpeningBra,
     ClosingBra,
-    OpeningQuo,
-    ClosingQuo,
-    OpeningDiv,
-    ClosingDiv,
+    Quo,
+    Div,
     Equal,
     GreaterEqual,
     Greater,
@@ -36,7 +34,7 @@ pub enum TokenType {
     Minus,
     Plus,
     Multi,
-    Div,
+    Divison,
     Comma,
     Colon
 }

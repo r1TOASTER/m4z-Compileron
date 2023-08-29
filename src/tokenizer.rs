@@ -10,6 +10,15 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     else if str.eq("ret") {
         return Some(TokenType::Ret);
     }
+    else if str.eq("if") {
+        return Some(TokenType::If);
+    }
+    else if str.eq("else") {
+        return Some(TokenType::Else);
+    }
+    else if str.eq("elif") {
+        return Some(TokenType::Elif);
+    }
     else if str.eq("int") {
         return Some(TokenType::IntKeyword);
     }
@@ -64,6 +73,9 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     else if str.eq("=") {
         return Some(TokenType::Equal);
     }
+    else if str.eq("==") {
+        return Some(TokenType::EqualEqual);
+    }
     else if str.eq(">=") {
         return Some(TokenType::GreaterEqual);
     }
@@ -103,7 +115,7 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
     // iterate over the splitted buffer (using whitespaces)
     for maybe_token in buffer_split {
         println!("current token: {}", &maybe_token);
-        // match if returned 
+        // match if returned - if the standalone is a keyword
         let is_keyword = match is_keyword_alone(&maybe_token) {
             Some(token_type) => {
                 tokens.push(Token { Type: token_type, Data: None });
@@ -113,11 +125,17 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
                 false
             }
         };
+        
         // if isn't a stand alone token - keyword
         if !is_keyword {
-            
-        }
+            // if that's an entire word (name like variable)
+            if maybe_token.chars().all(|b| matches!(b, 'A'..='Z' | 'a'..='z' | '0'..='9' | '_')) {
+                tokens.push(Token { Type: TokenType::NameLiteral, Data: Some(maybe_token.to_owned()) });
+            }
+            else {
 
+            }
+        }
     } 
     tokens
 }

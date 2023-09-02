@@ -40,7 +40,8 @@ pub enum TokenType {
     Multi,
     Divison,
     Comma,
-    Colon
+    Colon,
+    NotInitiallized
 }
 
 #[allow(non_snake_case)]
@@ -48,4 +49,16 @@ pub enum TokenType {
 pub struct Token {
     pub Type: TokenType,
     pub Data: Option<String>,
+}
+
+impl PartialEq for TokenType {
+    fn eq(&self, other: &Self) -> bool {
+        self == other
+    }
+}
+
+impl PartialEq for Token {
+    fn eq(&self, other: &Self) -> bool {
+        (self.Type == other.Type) && (self.Data == other.Data)
+    }
 }

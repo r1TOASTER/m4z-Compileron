@@ -113,11 +113,24 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
 }
 
 const NAME_LITERAL_REGEX_PATTERN: &str = r"^[a-zA-Z_][a-zA-Z0-9_]*$";
+const INT_LITERAL_REGEX_PATTERN: &str = r"^[0-9]+$";
+const DOUBLE_LITERAL_REGEX_PATTERN: &str = r"^[0-9]+\.[0-9]+$";
 
 fn is_name_literal(buffer: &String) -> bool {
     let regex = Regex::new(NAME_LITERAL_REGEX_PATTERN).expect("Error creating regex for name literals match");
     regex.is_match(buffer.as_str())
 }
+
+fn is_int(buffer: &String) -> bool {
+    let regex = Regex::new(INT_LITERAL_REGEX_PATTERN).expect("Error creating regex for int literals match");
+    regex.is_match(buffer.as_str())
+}
+
+fn is_double(buffer: &String) -> bool {
+    let regex = Regex::new(DOUBLE_LITERAL_REGEX_PATTERN).expect("Error creating regex for double literals match");
+    regex.is_match(buffer.as_str())
+}
+
 
 fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) -> Option<(usize, Token)> {
     let mut index = index;
@@ -126,7 +139,7 @@ fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) ->
         
         let mut data_buffer = String::new(); 
         
-        // if start of a string
+        // if start is a string / char
         if current_char == identifier {
             // skip the first "
             index += 1;
@@ -149,12 +162,75 @@ fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) ->
                 panic!("Couldn't find end of literal");
             }
         }
-
+        
         else {
             index += 1;
         }
     }
     None
+}
+
+fn is_not_continue_of_name(next_char: char) -> bool {
+    let list_of_seperates: Vec<char> = vec!['[', ']', '(' , ')', '\'', '\"', '{', '}', ',', ';', ':'];
+    list_of_seperates.contains(&next_char)
+}
+
+fn define_type_using_name(keyword: &String) -> TokenType {
+    match is_keyword_alone(keyword) {
+        Some(token_type) => token_type,
+        None => panic!("wasn't a keyword, error"),
+    }
+}
+
+fn is_keyword_contained(index: usize, buffer: &String) -> Option<(usize, Token)> {
+    let list_of_keywords: Vec<&str> = vec!["dec", "ret", "if", "elif", "else", "int", "uint", "char", "str", "boolean", "double", ">=", "=>", "<=", "=<", "=="];
+    
+    for &prob_keyword in &list_of_keywords {
+        if let Some(mut i) = buffer.find(prob_keyword) {
+            // if that's the start of the buffer
+            if i == index {
+                i += prob_keyword.len();
+                // if there is a continue to the buffer 
+                if i <= (buffer.len() - 1) {
+                    // check if the next chars are seperates or its a name
+                    if is_not_continue_of_name(buffer.chars().nth(i).expect("Not a char")) {
+                        i -= 1;
+                        return Some((i, Token { Type: define_type_using_name(&prob_keyword.to_owned()) , Data: None }));
+                    }
+                }
+                // no continue, it's the whole token
+                else {
+                    i -= 1;
+                    return Some((i, Token { Type: define_type_using_name(&prob_keyword.to_owned()) , Data: None }));
+                }
+            }
+        }
+    }
+
+    // not a keyword contained from this index
+    None
+}
+
+// can be literal / name
+fn push_literal(tokens: &mut Vec<Token>, literal: &mut String) {
+    let mut token_type: TokenType = TokenType::NotInitiallized;
+    if is_name_literal(&literal) {
+        token_type = TokenType::NameLiteral;
+    }
+    // if it's a literal like true / false / int / uint / double (regex to check that as well) 
+    else {
+        if (literal == "true") || (literal == "false") {
+            token_type = TokenType::BooleanLiteral;
+        }
+        else if is_int(&literal) {
+            token_type = TokenType::IntLiteral;
+        }
+        else if is_double(&literal) {
+            token_type = TokenType::DoubleLiteral;
+        }
+    }
+    tokens.push(Token { Type: token_type, Data: Some(literal.to_string()) });
+    literal.clear();
 }
 
 pub fn tokenize(buffer: &mut String) -> Vec<Token> {
@@ -199,8 +275,56 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
                         }
                     },
                 }
-                // else, probably start with other token, name or [ { ( , :  
+
+                let mut literal_buffer = String::new();
+
+                // else, probably start with other token, name or [ { ( , : ;  
                 while buffer_index < maybe_token.len() {
+
+                    // if a single char is a keyword ( ) [ ] { } , : ; 
+                    let is_single_char_keyword_alone = match is_keyword_alone(&(maybe_token.chars().nth(buffer_index).expect("No first char found").to_string().to_owned())) {
+                        Some(token_type) => {
+                            if !literal_buffer.is_empty() { push_literal(&mut tokens, &mut literal_buffer); }
+                            tokens.push(Token { Type: token_type, Data: None });
+                            true
+                        },
+                        None => {
+                            false
+                        }
+                    };
+
+                    // else, try to see if thats a string or char in the middle
+                    if !is_single_char_keyword_alone {
+                        match get_token_from_identifier(buffer_index, '\"', &maybe_token) {
+                            Some((index, token)) => {
+                                if !literal_buffer.is_empty() { push_literal(&mut tokens, &mut literal_buffer); }
+                                tokens.push(token);
+                                buffer_index = index;
+                            },
+                            None => {
+                                // if not a string at the start, check for a char
+                                match get_token_from_identifier(buffer_index, '\'', &maybe_token) {
+                                    Some((index, token)) => {
+                                        if !literal_buffer.is_empty() { push_literal(&mut tokens, &mut literal_buffer); }
+                                        tokens.push(token);
+                                        buffer_index = index;
+                                    },
+                                    None => {},
+                                }
+                            },
+                        }
+                        // try to see if that's a keyword like str or something like that
+                        match is_keyword_contained(buffer_index, &maybe_token) {
+                            Some((index, token)) => {
+                                if !literal_buffer.is_empty() { push_literal(&mut tokens, &mut literal_buffer); }
+                                tokens.push(token);
+                                buffer_index = index;
+                            },
+                            None => {
+                                literal_buffer.push(maybe_token.chars().nth(buffer_index).expect("No char was found"));
+                            },
+                        }  
+                    }
                     buffer_index += 1;
                 } 
             }

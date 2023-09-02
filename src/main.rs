@@ -31,6 +31,7 @@ fn main() {
 
     let input_file_path: String = input_file_path.to_str().expect("").to_owned();
     let mut input_file_buffer = std::fs::read_to_string(input_file_path).expect("Can't read the file");
-    let token_test = tokenize(&mut input_file_buffer);
-    dbg!(token_test);
+    let tokens_test = tokenize(&mut input_file_buffer);
+    
+    dbg!(tokens_test);
 }

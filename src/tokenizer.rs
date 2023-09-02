@@ -131,6 +131,10 @@ fn is_double(buffer: &String) -> bool {
     regex.is_match(buffer.as_str())
 }
 
+fn is_boolean(buffer: &String) -> bool {
+    buffer.eq("true") || buffer.eq("false")
+}
+
 
 fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) -> Option<(usize, Token)> {
     let mut index = index;
@@ -214,12 +218,12 @@ fn is_keyword_contained(index: usize, buffer: &String) -> Option<(usize, Token)>
 // can be literal / name
 fn push_literal(tokens: &mut Vec<Token>, literal: &mut String) {
     let mut token_type: TokenType = TokenType::NotInitiallized;
-    if is_name_literal(&literal) {
+    if is_name_literal(&literal) && !is_boolean(&literal) {
         token_type = TokenType::NameLiteral;
     }
     // if it's a literal like true / false / int / uint / double (regex to check that as well) 
     else {
-        if (literal == "true") || (literal == "false") {
+        if is_boolean(&literal) {
             token_type = TokenType::BooleanLiteral;
         }
         else if is_int(&literal) {

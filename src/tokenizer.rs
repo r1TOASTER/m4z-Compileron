@@ -1,5 +1,8 @@
 use crate::token::{Token, TokenType};
 
+extern crate regex;
+use regex::Regex;
+
 fn is_keyword_alone(str: &String) -> Option<TokenType> {
     if str.eq("dec") {
         return Some(TokenType::Dec);
@@ -109,10 +112,17 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     None
 }
 
+const NAME_LITERAL_REGEX_PATTERN: &str = r"^[a-zA-Z_][a-zA-Z0-9_]*$";
+
+fn is_name_literal(buffer: &String) -> bool {
+    let regex = Regex::new(NAME_LITERAL_REGEX_PATTERN).expect("Error creating regex for name literals match");
+    regex.is_match(buffer.as_str())
+}
+
 fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) -> Option<(usize, Token)> {
     let mut index = index;
     while index < buffer.len() {
-        let current_char = buffer.chars().nth(index).expect("No char found");
+        let current_char = buffer.chars().nth(index).expect("No closer was found");
         
         let mut data_buffer = String::new(); 
         
@@ -120,12 +130,12 @@ fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) ->
         if current_char == identifier {
             // skip the first "
             index += 1;
-            while (buffer.chars().nth(index).expect("No char found") != identifier) && (index < buffer.len()) {
-                data_buffer.push(buffer.chars().nth(index).expect("No char found"));
+            while (buffer.chars().nth(index).expect("No closer was found") != identifier) && (index < buffer.len()) {
+                data_buffer.push(buffer.chars().nth(index).expect("No closer was found"));
                 index += 1;
             }
             // if found end of string, push token and increment index
-            if buffer.chars().nth(index).expect("No char found") == identifier {
+            if buffer.chars().nth(index).expect("No closer was found") == identifier {
                 index += 1;
                 if identifier == '\'' {
                     return Some((index, Token { Type: TokenType::CharLiteral, Data: Some(data_buffer) }));
@@ -136,7 +146,7 @@ fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) ->
             }
             // end of thing, not found the end of string
             else {
-                panic!("Couldn't find end of string");
+                panic!("Couldn't find end of literal");
             }
         }
 
@@ -167,7 +177,7 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
         // if isn't a stand alone token - keyword
         if !is_keyword {
             // if that's an entire word (name like variable)
-            if maybe_token.chars().all(|b| matches!(b, 'A'..='Z' | 'a'..='z' | '0'..='9' | '_')) {
+            if is_name_literal(&maybe_token) {
                 tokens.push(Token { Type: TokenType::NameLiteral, Data: Some(maybe_token.to_owned()) });
             }
             else {
@@ -189,7 +199,7 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
                         }
                     },
                 }
-                // else, probably start with other token, name or [, {, (, ',', ', )}]
+                // else, probably start with other token, name or [ { ( , :  
                 while buffer_index < maybe_token.len() {
                     buffer_index += 1;
                 } 

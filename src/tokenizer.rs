@@ -109,6 +109,44 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     None
 }
 
+fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) -> Option<(usize, Token)> {
+    let mut index = index;
+    while index < buffer.len() {
+        let current_char = buffer.chars().nth(index).expect("No char found");
+        
+        let mut data_buffer = String::new(); 
+        
+        // if start of a string
+        if current_char == identifier {
+            // skip the first "
+            index += 1;
+            while (buffer.chars().nth(index).expect("No char found") != identifier) && (index < buffer.len()) {
+                data_buffer.push(buffer.chars().nth(index).expect("No char found"));
+                index += 1;
+            }
+            // if found end of string, push token and increment index
+            if buffer.chars().nth(index).expect("No char found") == identifier {
+                index += 1;
+                if identifier == '\'' {
+                    return Some((index, Token { Type: TokenType::CharLiteral, Data: Some(data_buffer) }));
+                }
+                else if identifier == '\"' {
+                    return Some((index, Token { Type: TokenType::StrLiteral, Data: Some(data_buffer) }));
+                }
+            }
+            // end of thing, not found the end of string
+            else {
+                panic!("Couldn't find end of string");
+            }
+        }
+
+        else {
+            index += 1;
+        }
+    }
+    None
+}
+
 pub fn tokenize(buffer: &mut String) -> Vec<Token> {
     let mut tokens: Vec<Token> = vec![];
     let buffer_split : Vec<String> = buffer.split_whitespace().map(str::to_string).collect();
@@ -133,7 +171,28 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
                 tokens.push(Token { Type: TokenType::NameLiteral, Data: Some(maybe_token.to_owned()) });
             }
             else {
-
+                let mut buffer_index = 0;
+                // if a string at the start, get it and return the next char index (where the string ends)
+                match get_token_from_identifier(0, '\"', &maybe_token) {
+                    Some((index, token)) => {
+                        tokens.push(token);
+                        buffer_index = index;
+                    },
+                    None => {
+                        // if not a string at the start, check for a char
+                        match get_token_from_identifier(0, '\'', &maybe_token) {
+                            Some((index, token)) => {
+                                tokens.push(token);
+                                buffer_index = index;
+                            },
+                            None => {},
+                        }
+                    },
+                }
+                // else, probably start with other token, name or [, {, (, ',', ', )}]
+                while buffer_index < maybe_token.len() {
+                    buffer_index += 1;
+                } 
             }
         }
     } 

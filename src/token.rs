@@ -10,6 +10,7 @@ pub enum TokenType {
     NameLiteral,
     IntKeyword,
     UIntKeyword,
+    IntOrUintKeyword,
     CharKeyword,
     StrKeyword,
     DoubleKeyword,

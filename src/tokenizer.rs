@@ -121,7 +121,7 @@ fn is_name_literal(buffer: &String) -> bool {
     regex.is_match(buffer.as_str())
 }
 
-fn is_int(buffer: &String) -> bool {
+fn is_int_or_uint(buffer: &String) -> bool {
     let regex = Regex::new(INT_LITERAL_REGEX_PATTERN).expect("Error creating regex for int literals match");
     regex.is_match(buffer.as_str())
 }
@@ -226,8 +226,8 @@ fn push_literal(tokens: &mut Vec<Token>, literal: &mut String) {
         if is_boolean(&literal) {
             token_type = TokenType::BooleanLiteral;
         }
-        else if is_int(&literal) {
-            token_type = TokenType::IntLiteral;
+        else if is_int_or_uint(&literal) {
+            token_type = TokenType::IntOrUintKeyword;
         }
         else if is_double(&literal) {
             token_type = TokenType::DoubleLiteral;

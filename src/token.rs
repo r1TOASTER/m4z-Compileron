@@ -42,6 +42,7 @@ pub enum TokenType {
     Divison,
     Comma,
     Colon,
+    Dot,
     NotInitiallized
 }
 

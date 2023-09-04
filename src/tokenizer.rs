@@ -22,10 +22,10 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     else if str.eq("elif") {
         return Some(TokenType::Elif);
     }
-    else if str.eq("int") {
+    else if str.eq("i32") {
         return Some(TokenType::IntKeyword);
     }
-    else if str.eq("uint") {
+    else if str.eq("u32") {
         return Some(TokenType::UIntKeyword);
     }
     else if str.eq("char") {
@@ -109,6 +109,9 @@ fn is_keyword_alone(str: &String) -> Option<TokenType> {
     else if str.eq("/") {
         return Some(TokenType::Divison);
     }
+    else if str.eq(".") {
+        return Some(TokenType::Dot);
+    }
     None
 }
 
@@ -175,7 +178,7 @@ fn get_token_from_identifier(index: usize, identifier: char, buffer: &String) ->
 }
 
 fn is_not_continue_of_name(next_char: char) -> bool {
-    let list_of_seperates: Vec<char> = vec!['[', ']', '(' , ')', '\'', '\"', '{', '}', ',', ';', ':'];
+    let list_of_seperates: Vec<char> = vec!['[', ']', '(' , ')', '\'', '\"', '{', '}', ',', ';', ':', '.'];
     list_of_seperates.contains(&next_char)
 }
 
@@ -187,7 +190,7 @@ fn define_type_using_name(keyword: &String) -> TokenType {
 }
 
 fn is_keyword_contained(index: usize, buffer: &String) -> Option<(usize, Token)> {
-    let list_of_keywords: Vec<&str> = vec!["dec", "ret", "if", "elif", "else", "int", "uint", "char", "str", "boolean", "double", ">=", "=>", "<=", "=<", "=="];
+    let list_of_keywords: Vec<&str> = vec!["dec", "ret", "if", "elif", "else", "i32", "u32", "char", "str", "boolean", "double", ">=", "=>", "<=", "=<", "=="];
     
     for &prob_keyword in &list_of_keywords {
         if let Some(mut i) = buffer.find(prob_keyword) {

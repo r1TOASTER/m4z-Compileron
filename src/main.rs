@@ -1,9 +1,13 @@
 mod tokenizer;
 mod token;
+mod precompiler;
+mod parser;
+mod macros;
 
 use std::{env, path::Path};
 
 use tokenizer::tokenize;
+use precompiler::pre_compile;
 
 fn main() {
     // Get args from command line
@@ -31,7 +35,9 @@ fn main() {
 
     let input_file_path: String = input_file_path.to_str().expect("").to_owned();
     let mut input_file_buffer = std::fs::read_to_string(input_file_path).expect("Can't read the file");
-    let tokens_test = tokenize(&mut input_file_buffer);
+    
+    let mut after_pre_compiler_buffer = pre_compile(&mut input_file_buffer);
+    let tokens_test = tokenize(&mut after_pre_compiler_buffer);
     
     dbg!(tokens_test);
 }

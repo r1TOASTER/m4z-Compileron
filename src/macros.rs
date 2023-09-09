@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct MacroStruct {
     pub MacroLiteral: String,
     pub MacroReplacement: String,

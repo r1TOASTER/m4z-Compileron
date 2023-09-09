@@ -245,7 +245,6 @@ pub fn tokenize(buffer: &mut String) -> Vec<Token> {
     let buffer_split : Vec<String> = buffer.split_whitespace().map(str::to_string).collect();
     // iterate over the splitted buffer (using whitespaces)
     for maybe_token in buffer_split {
-        println!("current token: {}", &maybe_token);
         // match if returned - if the standalone is a keyword
         let is_keyword = match is_keyword_alone(&maybe_token) {
             Some(token_type) => {

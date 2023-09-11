@@ -2,6 +2,7 @@
 pub struct MacroStruct {
     pub MacroLiteral: String,
     pub MacroReplacement: String,
+    pub WholeMacro: String,
 }
 
 impl MacroStruct {
@@ -10,5 +11,8 @@ impl MacroStruct {
     }
     pub fn getReplacement(&self) -> &str {
         &self.MacroReplacement.as_str()
+    }
+    pub fn getWholeMacro(&self) -> &str {
+        &self.WholeMacro.as_str()
     }
 }

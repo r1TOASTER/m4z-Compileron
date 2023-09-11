@@ -10,7 +10,7 @@ pub fn pre_compile(buffer: &mut String) -> String {
 
     for maybe_macro_line in macro_lines {
 
-        let mut current_macro = MacroStruct { MacroLiteral: String::new(), MacroReplacement: String::new() };
+        let mut current_macro = MacroStruct { MacroLiteral: String::new(), MacroReplacement: String::new(), WholeMacro: String::new() };
         // get the line splitted by space
         let macro_line: Vec<&str> = maybe_macro_line.rsplit(' ').rev().collect();
 
@@ -31,8 +31,6 @@ pub fn pre_compile(buffer: &mut String) -> String {
                     index += 1;
                 }
 
-                current_macro.MacroLiteral = current_macro.MacroLiteral.trim_end().to_string();
-
                 // if last index - no "with" keyword
                 if index == macro_line.len() {
                     panic!("'with' keyword missing");
@@ -47,7 +45,6 @@ pub fn pre_compile(buffer: &mut String) -> String {
                     index += 1;
                 }
 
-                current_macro.MacroReplacement = current_macro.MacroReplacement.trim_end().to_string();
 
                 if index == macro_line.len() {
                     panic!("'end' keyword missing");
@@ -59,13 +56,19 @@ pub fn pre_compile(buffer: &mut String) -> String {
 
             let mut macro_full_line = String::from("macro ");
             macro_full_line += current_macro.getLiteral();
+            macro_full_line += "with ";
             macro_full_line += current_macro.getReplacement();
             macro_full_line += "end\r\n";
+
             // delete every macro after getting it to the macro list
+
+            dbg!(&macro_full_line);
+
             return_buffer = return_buffer.replace(&macro_full_line, "");
             
-            dbg!(&return_buffer);
-            
+            current_macro.MacroLiteral = current_macro.MacroLiteral.trim_end().to_string();
+            current_macro.MacroReplacement = current_macro.MacroReplacement.trim_end().to_string();
+
             macro_list.push(current_macro);
         }
     }

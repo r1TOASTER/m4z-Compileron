@@ -54,21 +54,21 @@ pub fn pre_compile(buffer: &mut String) -> String {
                 index += 1;
             }
 
+            // get the entire macro line to remove it from the original buffer
             let mut macro_full_line = String::from("macro ");
             macro_full_line += current_macro.get_literal();
             macro_full_line += "with ";
             macro_full_line += current_macro.get_replacement();
             macro_full_line += "end\r\n";
 
-            // delete every macro after getting it to the macro list
-
-            dbg!(&macro_full_line);
-
+            // delete every macro line after getting it to the macro list
             return_buffer = return_buffer.replace(&macro_full_line, "");
             
+            // trim the extra spaces at the end of the macro literal and replacement
             current_macro.macro_literal = current_macro.macro_literal.trim_end().to_string();
             current_macro.macro_replacement = current_macro.macro_replacement.trim_end().to_string();
-
+            
+            // push the current macro to the list
             macro_list.push(current_macro);
         }
     }

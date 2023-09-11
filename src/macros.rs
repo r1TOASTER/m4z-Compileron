@@ -1,18 +1,14 @@
 #[derive(Debug)]
 pub struct MacroStruct {
-    pub MacroLiteral: String,
-    pub MacroReplacement: String,
-    pub WholeMacro: String,
+    pub macro_literal: String,
+    pub macro_replacement: String,
 }
 
 impl MacroStruct {
-    pub fn getLiteral(&self) -> &str {
-        &self.MacroLiteral.as_str()
+    pub fn get_literal(&self) -> &str {
+        &self.macro_literal.as_str()
     }
-    pub fn getReplacement(&self) -> &str {
-        &self.MacroReplacement.as_str()
-    }
-    pub fn getWholeMacro(&self) -> &str {
-        &self.WholeMacro.as_str()
+    pub fn get_replacement(&self) -> &str {
+        &self.macro_replacement.as_str()
     }
 }

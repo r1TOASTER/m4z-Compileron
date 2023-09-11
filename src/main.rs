@@ -42,5 +42,5 @@ fn main() {
 
     let tokens_test = tokenize(&mut after_pre_compiler_buffer);
     
-    // dbg!(&tokens_test);
+    dbg!(&tokens_test);
 }

@@ -59,7 +59,7 @@ pub fn pre_compile(buffer: &mut String) -> String {
             macro_full_line += current_macro.get_literal();
             macro_full_line += "with ";
             macro_full_line += current_macro.get_replacement();
-            macro_full_line += "end\r\n";
+            macro_full_line += macro_line[macro_line.len() - 1];
 
             // delete every macro line after getting it to the macro list
             return_buffer = return_buffer.replace(&macro_full_line, "");
@@ -67,7 +67,7 @@ pub fn pre_compile(buffer: &mut String) -> String {
             // trim the extra spaces at the end of the macro literal and replacement
             current_macro.macro_literal = current_macro.macro_literal.trim_end().to_string();
             current_macro.macro_replacement = current_macro.macro_replacement.trim_end().to_string();
-            
+
             // push the current macro to the list
             macro_list.push(current_macro);
         }

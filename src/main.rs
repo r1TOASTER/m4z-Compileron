@@ -38,9 +38,10 @@ fn main() {
     
     let mut after_pre_compiler_buffer = pre_compile(&mut input_file_buffer);
 
-    dbg!(&after_pre_compiler_buffer);
+    // dbg!(&after_pre_compiler_buffer);
 
     let tokens_test = tokenize(&mut after_pre_compiler_buffer);
     
-    dbg!(&tokens_test);
+    // dbg!(&tokens_test);
+    print!("{}", after_pre_compiler_buffer);
 }

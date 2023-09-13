@@ -36,12 +36,13 @@ fn main() {
     let input_file_path: String = input_file_path.to_str().expect("").to_owned();
     let mut input_file_buffer = std::fs::read_to_string(input_file_path).expect("Can't read the file");
     
-    let mut after_pre_compiler_buffer = pre_compile(&mut input_file_buffer);
+    let (mut after_pre_compiler_buffer, include_list) = pre_compile(&mut input_file_buffer);
 
     // dbg!(&after_pre_compiler_buffer);
 
     let tokens_test = tokenize(&mut after_pre_compiler_buffer);
     
     // dbg!(&tokens_test);
+    dbg!(&include_list);
     print!("{}", after_pre_compiler_buffer);
 }
